@@ -33,9 +33,7 @@ function CaseDetail({ variantId }) {
   return (
     <>
       <h3 className="detail-title">{variant.label}</h3>
-      <p className="detail-kicker">
-        {variant.conforming ? 'Conforming case' : 'Deviating case'} · {variant.source}
-      </p>
+      <p className="detail-kicker">{variant.source}</p>
       <div className="stat-cards stat-cards--detail">
         <div className="stat-card">
           <div className="stat-value">{totalDays.toFixed(1)}d</div>

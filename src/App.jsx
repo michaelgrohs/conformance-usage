@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { GROUP_LABELS, VARIANT_IDS, variants } from './data/variants.js'
+import { GROUP_LABELS, GROUPS, VARIANT_IDS, variants } from './data/variants.js'
 import { useGroupAssignment } from './hooks/useGroupAssignment.js'
 import ProcessModelViewer from './components/ProcessModelViewer.jsx'
 import OverviewStats from './components/OverviewStats.jsx'
@@ -34,11 +34,13 @@ export default function App() {
         <TraceSelector selectedId={variantId} onChange={setVariantId} />
         <TraceStrip variant={variant} onOpenCase={() => setSelection({ type: 'case', id: variantId })} />
 
-        <ConformancePanel
-          group={group}
-          variant={variant}
-          onOpenDeviation={(id) => setSelection({ type: 'deviation', id })}
-        />
+        {group !== GROUPS.TRACE_ONLY && (
+          <ConformancePanel
+            group={group}
+            variant={variant}
+            onOpenDeviation={(id) => setSelection({ type: 'deviation', id })}
+          />
+        )}
       </main>
 
       <DetailPanel selection={selection} onClose={() => setSelection(null)} />

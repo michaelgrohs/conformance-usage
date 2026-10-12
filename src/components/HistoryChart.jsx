@@ -1,3 +1,5 @@
+import { useLayoutEffect, useRef, useState } from 'react'
+
 const CHART_HEIGHT = 100
 
 function formatDate(iso) {
@@ -5,67 +7,83 @@ function formatDate(iso) {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
-const RATE_CHART_WIDTH = 440
-const RATE_CHART_HEIGHT = 110
-const RATE_CHART_LEFT_PAD = 30
-const RATE_CHART_RIGHT_PAD = 6
-const RATE_CHART_TOP_PAD = 6
-const RATE_CHART_BOTTOM_PAD = 6
-const RATE_GRID_LINES = [0, 50, 100]
+const RATE_HEIGHT = 96
+const RATE_GRID_VALUES = [100, 50, 0]
 
-// Daily conformance rate (%), as a line. Used in the shared overview (same
-// content for all three groups — see CLAUDE.md).
+// Daily conformance rate (%), as a line — built from real, measured HTML
+// elements (a ResizeObserver on the plot area, same technique as the trace
+// chevrons) rather than a scaled SVG viewBox. An SVG stretched to an
+// arbitrary container width/height with preserveAspectRatio="none" can
+// render the line faintly blurred/aliased at odd scale factors; plain
+// pixel-positioned divs don't have that problem. Used in the shared
+// overview (same content for all three groups — see CLAUDE.md).
 export function ConformanceRateChart({ data }) {
-  const plotW = RATE_CHART_WIDTH - RATE_CHART_LEFT_PAD - RATE_CHART_RIGHT_PAD
-  const plotH = RATE_CHART_HEIGHT - RATE_CHART_TOP_PAD - RATE_CHART_BOTTOM_PAD
-  const stepX = data.length > 1 ? plotW / (data.length - 1) : 0
+  const plotRef = useRef(null)
+  const [width, setWidth] = useState(0)
+
+  useLayoutEffect(() => {
+    const el = plotRef.current
+    if (!el) return
+    const measure = () => setWidth(el.offsetWidth)
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const points = data.map((d, i) => {
     const total = d.conforming + d.deviating
     const rate = total ? (d.conforming / total) * 100 : 0
+    const x = data.length > 1 ? (i / (data.length - 1)) * width : 0
+    const y = RATE_HEIGHT - (rate / 100) * RATE_HEIGHT
+    return { date: d.date, rate, x, y }
+  })
+
+  const segments = points.slice(0, -1).map((p, i) => {
+    const next = points[i + 1]
+    const dx = next.x - p.x
+    const dy = next.y - p.y
     return {
-      date: d.date,
-      rate,
-      x: RATE_CHART_LEFT_PAD + i * stepX,
-      y: RATE_CHART_TOP_PAD + plotH - (rate / 100) * plotH,
+      left: p.x,
+      top: p.y - 1,
+      length: Math.sqrt(dx * dx + dy * dy),
+      angle: (Math.atan2(dy, dx) * 180) / Math.PI,
     }
   })
-  const polylinePoints = points.map((p) => `${p.x},${p.y}`).join(' ')
 
   return (
     <div className="history-chart">
-      <svg
-        className="rate-chart"
-        viewBox={`0 0 ${RATE_CHART_WIDTH} ${RATE_CHART_HEIGHT}`}
-        preserveAspectRatio="none"
-        role="img"
-        aria-label="Conformance rate over time"
-      >
-        {RATE_GRID_LINES.map((g) => {
-          const y = RATE_CHART_TOP_PAD + plotH - (g / 100) * plotH
-          return (
-            <g key={g}>
-              <line
-                x1={RATE_CHART_LEFT_PAD}
-                y1={y}
-                x2={RATE_CHART_WIDTH - RATE_CHART_RIGHT_PAD}
-                y2={y}
-                className="rate-chart-gridline"
-                vectorEffect="non-scaling-stroke"
+      <div className="rate-chart">
+        <div className="rate-chart-labels" style={{ height: RATE_HEIGHT }}>
+          {RATE_GRID_VALUES.map((g) => (
+            <span key={g} className="rate-chart-label" style={{ top: RATE_HEIGHT - (g / 100) * RATE_HEIGHT }}>
+              {g}%
+            </span>
+          ))}
+        </div>
+        <div className="rate-chart-plot" ref={plotRef} style={{ height: RATE_HEIGHT }}>
+          {RATE_GRID_VALUES.map((g) => (
+            <div key={g} className="rate-chart-gridline" style={{ top: RATE_HEIGHT - (g / 100) * RATE_HEIGHT }} />
+          ))}
+          {width > 0 &&
+            segments.map((s, i) => (
+              <div
+                key={i}
+                className="rate-chart-segment"
+                style={{ left: s.left, top: s.top, width: s.length, transform: `rotate(${s.angle}deg)` }}
               />
-              <text x={RATE_CHART_LEFT_PAD - 5} y={y} className="rate-chart-axis-label" textAnchor="end" dominantBaseline="middle">
-                {g}%
-              </text>
-            </g>
-          )
-        })}
-        <polyline points={polylinePoints} className="rate-chart-line" vectorEffect="non-scaling-stroke" />
-        {points.map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r={2.4} className="rate-chart-dot">
-            <title>{`${formatDate(p.date)} — ${Math.round(p.rate)}% conforming`}</title>
-          </circle>
-        ))}
-      </svg>
+            ))}
+          {width > 0 &&
+            points.map((p, i) => (
+              <div
+                key={i}
+                className="rate-chart-dot"
+                style={{ left: p.x, top: p.y }}
+                title={`${formatDate(p.date)} — ${Math.round(p.rate)}% conforming`}
+              />
+            ))}
+        </div>
+      </div>
       <div className="history-axis">
         <span>{formatDate(data[0].date)}</span>
         <span>{formatDate(data[data.length - 1].date)}</span>

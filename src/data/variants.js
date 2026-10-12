@@ -1,6 +1,9 @@
 // The three order-to-cash trace variants available in the tool, selectable
-// via the dropdown. See CLAUDE.md "Data sourcing" for exact provenance of
-// each.
+// via the dropdown as "Variant 1/2/3" — deliberately neutral labels, since
+// the dropdown must not reveal which variants conform or deviate (that's
+// conformance information, which only belongs in the "Conformance checking
+// results" panel — see CLAUDE.md). See CLAUDE.md "Data sourcing" for exact
+// provenance of each.
 //
 // Each variant carries:
 // - trace: the recorded sequence of activity names.
@@ -34,7 +37,7 @@ export const VARIANT_IDS = {
 export const variants = {
   [VARIANT_IDS.DEVIATION_A]: {
     id: VARIANT_IDS.DEVIATION_A,
-    label: 'Variant A — insert, skip, repeat',
+    label: 'Variant 1',
     source: 'Qualtrics export: "Order-to-cash – Deviation Identification Task"',
     conforming: false,
     trace: [
@@ -98,7 +101,7 @@ export const variants = {
 
   [VARIANT_IDS.DEVIATION_B]: {
     id: VARIANT_IDS.DEVIATION_B,
-    label: 'Variant B — replace, insert, swap',
+    label: 'Variant 2',
     source: 'Qualtrics export: "Order-to-cash – Correction Proposal Task"',
     conforming: false,
     trace: [
@@ -162,7 +165,7 @@ export const variants = {
 
   [VARIANT_IDS.CONFORMANT]: {
     id: VARIANT_IDS.CONFORMANT,
-    label: 'Variant C — conformant',
+    label: 'Variant 3',
     source: 'Fabricated: a short valid execution of the model (no optional back-order/reminder)',
     conforming: true,
     trace: [

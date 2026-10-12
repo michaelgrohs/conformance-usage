@@ -1,14 +1,5 @@
 import { GROUPS } from '../data/variants.js'
 
-function TraceOnlyView() {
-  return (
-    <p className="panel-empty">
-      No conformance checking results are shown for this group — only the
-      process model and the recorded trace above.
-    </p>
-  )
-}
-
 // Matches the alignment table + legend as shown in guide_event_level.pdf /
 // the Qualtrics export: a plain black-and-white grid, no colour-coding by
 // move type (the legend explains the move type via the A / >> notation
@@ -111,13 +102,15 @@ function PatternLevelView({ variant, onOpenDeviation }) {
   )
 }
 
+// Not rendered at all for the trace-only group (see App.jsx) — that's the
+// experimental baseline, so there's no "Conformance checking results"
+// section for it, rather than an empty one. See CLAUDE.md.
 export default function ConformancePanel({ group, variant, onOpenDeviation }) {
   return (
     <div className="panel conformance-panel">
       <div className="panel-header">
         <h2>Conformance checking results</h2>
       </div>
-      {group === GROUPS.TRACE_ONLY && <TraceOnlyView />}
       {group === GROUPS.EVENT_LEVEL && <EventLevelView variant={variant} onOpenDeviation={onOpenDeviation} />}
       {group === GROUPS.PATTERN_LEVEL && <PatternLevelView variant={variant} onOpenDeviation={onOpenDeviation} />}
     </div>
