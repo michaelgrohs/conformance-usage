@@ -5,7 +5,7 @@ import {
   CONFORMING_AVG_THROUGHPUT_DAYS,
   conformanceHistory,
 } from '../data/overviewStats.js'
-import { StackedHistoryChart } from './HistoryChart.jsx'
+import { ConformanceRateChart } from './HistoryChart.jsx'
 
 const conformingPct = Math.round((CONFORMING_CASES / TOTAL_CASES) * 1000) / 10
 const deviatingPct = Math.round((DEVIATING_CASES / TOTAL_CASES) * 1000) / 10
@@ -43,8 +43,8 @@ export default function OverviewStats() {
           <div className="stat-label">Avg. throughput, conforming cases</div>
         </div>
       </div>
-      <h3 className="subsection-title">Conformance history</h3>
-      <StackedHistoryChart data={conformanceHistory} />
+      <h3 className="subsection-title">Conformance history — % conforming per day</h3>
+      <ConformanceRateChart data={conformanceHistory} />
     </div>
   )
 }

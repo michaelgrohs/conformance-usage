@@ -5,41 +5,70 @@ function formatDate(iso) {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
-// Daily conforming/deviating case counts, stacked. Used in the shared
-// overview (same content for all three groups — see CLAUDE.md).
-export function StackedHistoryChart({ data }) {
-  const max = Math.max(...data.map((d) => d.conforming + d.deviating), 1)
+const RATE_CHART_WIDTH = 440
+const RATE_CHART_HEIGHT = 110
+const RATE_CHART_LEFT_PAD = 30
+const RATE_CHART_RIGHT_PAD = 6
+const RATE_CHART_TOP_PAD = 6
+const RATE_CHART_BOTTOM_PAD = 6
+const RATE_GRID_LINES = [0, 50, 100]
+
+// Daily conformance rate (%), as a line. Used in the shared overview (same
+// content for all three groups — see CLAUDE.md).
+export function ConformanceRateChart({ data }) {
+  const plotW = RATE_CHART_WIDTH - RATE_CHART_LEFT_PAD - RATE_CHART_RIGHT_PAD
+  const plotH = RATE_CHART_HEIGHT - RATE_CHART_TOP_PAD - RATE_CHART_BOTTOM_PAD
+  const stepX = data.length > 1 ? plotW / (data.length - 1) : 0
+
+  const points = data.map((d, i) => {
+    const total = d.conforming + d.deviating
+    const rate = total ? (d.conforming / total) * 100 : 0
+    return {
+      date: d.date,
+      rate,
+      x: RATE_CHART_LEFT_PAD + i * stepX,
+      y: RATE_CHART_TOP_PAD + plotH - (rate / 100) * plotH,
+    }
+  })
+  const polylinePoints = points.map((p) => `${p.x},${p.y}`).join(' ')
+
   return (
     <div className="history-chart">
-      <div className="history-bars" style={{ height: CHART_HEIGHT }}>
-        {data.map((d) => {
-          const total = d.conforming + d.deviating
-          const totalPx = (total / max) * CHART_HEIGHT
-          const devPx = total ? (d.deviating / total) * totalPx : 0
-          const confPx = totalPx - devPx
+      <svg
+        className="rate-chart"
+        viewBox={`0 0 ${RATE_CHART_WIDTH} ${RATE_CHART_HEIGHT}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label="Conformance rate over time"
+      >
+        {RATE_GRID_LINES.map((g) => {
+          const y = RATE_CHART_TOP_PAD + plotH - (g / 100) * plotH
           return (
-            <div
-              className="history-bar-col"
-              key={d.date}
-              title={`${formatDate(d.date)} — ${d.conforming} conforming, ${d.deviating} deviating`}
-            >
-              <div className="history-bar-seg history-bar-seg--conforming" style={{ height: confPx }} />
-              <div className="history-bar-seg history-bar-seg--deviating" style={{ height: devPx }} />
-            </div>
+            <g key={g}>
+              <line
+                x1={RATE_CHART_LEFT_PAD}
+                y1={y}
+                x2={RATE_CHART_WIDTH - RATE_CHART_RIGHT_PAD}
+                y2={y}
+                className="rate-chart-gridline"
+                vectorEffect="non-scaling-stroke"
+              />
+              <text x={RATE_CHART_LEFT_PAD - 5} y={y} className="rate-chart-axis-label" textAnchor="end" dominantBaseline="middle">
+                {g}%
+              </text>
+            </g>
           )
         })}
-      </div>
+        <polyline points={polylinePoints} className="rate-chart-line" vectorEffect="non-scaling-stroke" />
+        {points.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r={2.4} className="rate-chart-dot">
+            <title>{`${formatDate(p.date)} — ${Math.round(p.rate)}% conforming`}</title>
+          </circle>
+        ))}
+      </svg>
       <div className="history-axis">
         <span>{formatDate(data[0].date)}</span>
         <span>{formatDate(data[data.length - 1].date)}</span>
-      </div>
-      <div className="history-legend">
-        <span className="history-legend-item">
-          <i className="swatch swatch--conforming" /> Conforming
-        </span>
-        <span className="history-legend-item">
-          <i className="swatch swatch--deviating" /> Deviating
-        </span>
       </div>
     </div>
   )

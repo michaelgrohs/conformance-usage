@@ -195,12 +195,6 @@ body {
   min-width: 6px;
 }
 
-.history-bar-seg--conforming {
-  background: #ffffff;
-  border: 1px solid var(--ink);
-  border-bottom: none;
-}
-
 .history-bar-seg--deviating {
   background: var(--ink);
 }
@@ -213,32 +207,33 @@ body {
   color: var(--ink-muted);
 }
 
-.history-legend {
-  display: flex;
-  gap: 14px;
-  margin-top: 8px;
-  font-size: 0.78rem;
+/* ---- conformance-rate line chart (overview) ---- */
+.rate-chart {
+  width: 100%;
+  height: 110px;
+  display: block;
 }
 
-.history-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.rate-chart-gridline {
+  stroke: var(--border);
+  stroke-width: 1;
 }
 
-.swatch {
-  display: inline-block;
-  width: 11px;
-  height: 11px;
+.rate-chart-axis-label {
+  font-size: 9px;
+  fill: var(--ink-muted);
 }
 
-.swatch--conforming {
-  background: #ffffff;
-  border: 1px solid var(--ink);
+.rate-chart-line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.75;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
-.swatch--deviating {
-  background: var(--ink);
+.rate-chart-dot {
+  fill: var(--ink);
 }
 
 /* ---- trace selector ---- */
