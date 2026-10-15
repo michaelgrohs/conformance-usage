@@ -1,4 +1,7 @@
 import { GROUPS } from '../data/variants.js'
+import { useHoverTooltip } from '../hooks/useHoverTooltip.js'
+
+const DEVIATION_TIP = 'Click for this deviation’s frequency, history, and throughput impact'
 
 // Matches the alignment table + legend as shown in guide_event_level.pdf /
 // the Qualtrics export: a plain black-and-white grid, no colour-coding by
@@ -8,9 +11,10 @@ import { GROUPS } from '../data/variants.js'
 // representation (see CLAUDE.md).
 function EventLevelView({ variant, onOpenDeviation }) {
   const alignment = variant.eventLevelAlignment
+  const { tooltip, show, hide } = useHoverTooltip()
   return (
     <>
-      <div className="table-scroll">
+      <div className="table-scroll" onScroll={hide}>
         <table className="alignment-table">
           <tbody>
             <tr>
@@ -20,7 +24,8 @@ function EventLevelView({ variant, onOpenDeviation }) {
                   key={i}
                   className={move.deviationId ? 'is-clickable' : undefined}
                   onClick={move.deviationId ? () => onOpenDeviation(move.deviationId) : undefined}
-                  title={move.deviationId ? 'Click for this deviation’s frequency, history, and throughput impact' : undefined}
+                  onMouseEnter={move.deviationId ? (e) => show(e, DEVIATION_TIP) : undefined}
+                  onMouseLeave={move.deviationId ? hide : undefined}
                 >
                   {move.trace}
                 </td>
@@ -33,7 +38,8 @@ function EventLevelView({ variant, onOpenDeviation }) {
                   key={i}
                   className={move.deviationId ? 'is-clickable' : undefined}
                   onClick={move.deviationId ? () => onOpenDeviation(move.deviationId) : undefined}
-                  title={move.deviationId ? 'Click for this deviation’s frequency, history, and throughput impact' : undefined}
+                  onMouseEnter={move.deviationId ? (e) => show(e, DEVIATION_TIP) : undefined}
+                  onMouseLeave={move.deviationId ? hide : undefined}
                 >
                   {move.model}
                 </td>
@@ -42,6 +48,11 @@ function EventLevelView({ variant, onOpenDeviation }) {
           </tbody>
         </table>
       </div>
+      {tooltip && (
+        <div className="hover-tip-fixed" style={{ left: tooltip.x, top: tooltip.y }}>
+          {tooltip.text}
+        </div>
+      )}
       {alignment.some((m) => m.deviationId) && (
         <p className="panel-hint">Click a highlighted move to see its frequency, history and throughput impact.</p>
       )}
@@ -96,7 +107,7 @@ function PatternLevelView({ variant, onOpenDeviation }) {
           className="pattern-row is-clickable"
           key={d.id}
           onClick={() => onOpenDeviation(d.id)}
-          title="Click for this deviation's frequency, history, and throughput impact"
+          data-tooltip={DEVIATION_TIP}
         >
           <span className="pattern-label">{d.pattern}</span>
           <span className="pattern-divider" />

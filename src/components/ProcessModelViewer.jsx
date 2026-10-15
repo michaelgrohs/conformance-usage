@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import BpmnJS from 'bpmn-js/lib/NavigatedViewer'
 import orderToCashBpmnXml from '../data/orderToCash.bpmn?raw'
+import InfoTooltip from './InfoTooltip.jsx'
 
 const ZOOM_MIN = 0.2
 const ZOOM_MAX = 4
@@ -24,22 +25,30 @@ function applyReadableDefaultView(canvas) {
 }
 
 // Global activity filter, applied as bpmn-js marker classes rather than
-// colour (consistent with the rest of the tool): matching tasks get a
-// bolder outline, non-matching ones are faded. No marker at all when the
-// filter is empty.
-const FILTER_HIGHLIGHT = 'activity-filter-match'
+// colour (consistent with the rest of the tool): this is a supplementary
+// highlight on top of the real filtering that happens elsewhere (the trace
+// selector and Overview dashboard are actually narrowed down — see
+// filtering.js), not a substitute for it. Must-include activities get a
+// bolder outline, must-exclude activities get a crossed-out treatment,
+// everything else fades when any condition is active.
+const FILTER_INCLUDE = 'activity-filter-match'
+const FILTER_EXCLUDE = 'activity-filter-exclude'
 const FILTER_DIM = 'activity-filter-dim'
 
-function applyActivityFilter(viewer, activityFilter) {
+function applyActivityFilter(viewer, conditions) {
   const elementRegistry = viewer.get('elementRegistry')
   const canvas = viewer.get('canvas')
   const tasks = elementRegistry.filter((el) => el.type === 'bpmn:Task')
-  const hasFilter = activityFilter.length > 0
+  const hasFilter = conditions.length > 0
   tasks.forEach((el) => {
-    canvas.removeMarker(el, FILTER_HIGHLIGHT)
+    canvas.removeMarker(el, FILTER_INCLUDE)
+    canvas.removeMarker(el, FILTER_EXCLUDE)
     canvas.removeMarker(el, FILTER_DIM)
     if (!hasFilter) return
-    canvas.addMarker(el, activityFilter.includes(el.businessObject?.name) ? FILTER_HIGHLIGHT : FILTER_DIM)
+    const condition = conditions.find((c) => c.activity === el.businessObject?.name)
+    if (condition?.mode === 'exclude') canvas.addMarker(el, FILTER_EXCLUDE)
+    else if (condition?.mode === 'include') canvas.addMarker(el, FILTER_INCLUDE)
+    else canvas.addMarker(el, FILTER_DIM)
   })
 }
 
@@ -131,20 +140,18 @@ export default function ProcessModelViewer({ onOpenActivity, activityFilter = []
   return (
     <div className="panel process-model-panel">
       <div className="panel-header">
-        <h2>Process model</h2>
+        <h2>
+          Process model
+          <InfoTooltip text="You can drag to pan around the diagram, use the +/− buttons (or hold Ctrl/⌘ while scrolling) to zoom, and use Reset view to jump back to the default framing. Click any activity to see its execution frequency across all traces." />
+        </h2>
         <div className="zoom-controls">
-          <button type="button" className="ghost-button" onClick={() => zoomBy(1 / ZOOM_STEP)} title="Zoom out">
+          <button type="button" className="ghost-button" onClick={() => zoomBy(1 / ZOOM_STEP)}>
             −
           </button>
-          <button type="button" className="ghost-button" onClick={() => zoomBy(ZOOM_STEP)} title="Zoom in">
+          <button type="button" className="ghost-button" onClick={() => zoomBy(ZOOM_STEP)}>
             +
           </button>
-          <button
-            type="button"
-            className="ghost-button"
-            onClick={resetZoom}
-            title="Reset pan and zoom to the default view"
-          >
+          <button type="button" className="ghost-button" onClick={resetZoom}>
             Reset view
           </button>
         </div>
@@ -153,11 +160,7 @@ export default function ProcessModelViewer({ onOpenActivity, activityFilter = []
         Drag to pan. Use the +/− buttons, or hold Ctrl (⌘ on Mac) while scrolling, to zoom. Click
         an activity for its execution frequency.
       </p>
-      <div
-        className="bpmn-container"
-        ref={containerRef}
-        title="Click an activity for its execution frequency across all traces"
-      />
+      <div className="bpmn-container" ref={containerRef} />
     </div>
   )
 }

@@ -82,6 +82,8 @@ body {
 }
 
 .panel-header h2 {
+  display: inline-flex;
+  align-items: center;
   margin: 0;
   font-size: 1rem;
 }
@@ -90,6 +92,10 @@ body {
   margin: 4px 0 12px;
   font-size: 0.85rem;
   color: var(--ink-muted);
+}
+
+.overview-filter-note {
+  font-weight: 600;
 }
 
 .panel-empty {
@@ -147,6 +153,14 @@ body {
 
 .bpmn-container .djs-element.activity-filter-match .djs-visual > :first-child {
   stroke-width: 3px;
+}
+
+.bpmn-container .djs-element.activity-filter-exclude .djs-visual > :first-child {
+  stroke-dasharray: 4 3;
+}
+
+.bpmn-container .djs-element.activity-filter-exclude {
+  opacity: 0.55;
 }
 
 /* ---- Overview dashboard ---- */
@@ -283,7 +297,14 @@ body {
   flex-wrap: wrap;
 }
 
+.filter-bar-clear-group {
+  display: inline-flex;
+  align-items: center;
+}
+
 .filter-bar-label {
+  display: inline-flex;
+  align-items: center;
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -298,34 +319,103 @@ body {
   color: var(--ink);
 }
 
-.filter-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+/* ---- active filter rules ----
+   A bordered list, not pill chips — each active AND/NOT condition is
+   its own row with an explicit "Remove" action, read as a set of rules
+   rather than a loose cluster of tags. */
+.filter-rules {
   margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-.filter-chip {
+.filter-rules-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  background: var(--gray-fill);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.filter-rules-title {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+}
+
+.filter-rules-header span:last-child {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--ink-muted);
+}
+
+.filter-rules-list {
+  background: var(--panel-bg);
+}
+
+.filter-rule-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+}
+
+.filter-rule-row:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-rule-mode {
+  flex: none;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  background: var(--ink);
+  color: #ffffff;
+  padding: 3px 8px;
+  cursor: pointer;
+  width: 42px;
+  text-align: center;
+}
+
+.filter-rule-mode--exclude {
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.filter-rule-mode:hover {
+  opacity: 0.75;
+}
+
+.filter-rule-name {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.filter-rule-remove {
+  flex: none;
   font: inherit;
   font-size: 0.78rem;
-  font-weight: 600;
-  padding: 4px 8px;
-  border: 1.5px solid var(--ink);
-  border-radius: 999px;
-  background: var(--gray-fill);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
   color: var(--ink);
   cursor: pointer;
+  padding: 4px 10px;
 }
 
-.filter-chip:hover {
-  background: #e2e2e2;
-}
-
-.filter-chip span {
-  font-weight: 700;
+.filter-rule-remove:hover {
+  background: var(--bg);
+  border-color: var(--ink);
 }
 
 /* ---- trace selector ---- */
@@ -345,6 +435,137 @@ body {
   border-radius: 4px;
   background: var(--panel-bg);
   color: var(--ink);
+}
+
+/* ---- hover explanations ----
+   A visible, immediate tooltip rather than the native `title` attribute,
+   which has a long hover delay and no visual cue beforehand that one
+   exists — too easy to miss. Built with a `data-tooltip` attribute + ::after
+   rather than a JS tooltip library, consistent with this project's
+   plain-CSS-first approach. Defaults to opening above the element; add
+   `.tooltip-below` for controls near the top of the page where an
+   above-anchored tooltip would run off-screen. Includes a small arrow
+   caret (::before), mirroring the `arrow` option on the MUI Tooltip used
+   for this in the sibling 02_/03_ Desirability tools. */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  z-index: 60;
+  bottom: calc(100% + 9px);
+  left: 0;
+  width: max-content;
+  max-width: 280px;
+  background: var(--ink);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.4;
+  padding: 7px 10px;
+  border-radius: 5px;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.08s ease;
+}
+
+[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  z-index: 61;
+  bottom: 100%;
+  left: 7px;
+  border: 5px solid transparent;
+  border-top-color: var(--ink);
+  margin-bottom: -1px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.08s ease;
+}
+
+[data-tooltip].tooltip-below::after {
+  bottom: auto;
+  top: calc(100% + 9px);
+}
+
+[data-tooltip].tooltip-below::before {
+  bottom: auto;
+  top: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--ink);
+  margin-bottom: 0;
+  margin-top: -1px;
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after,
+[data-tooltip]:hover::before,
+[data-tooltip]:focus-visible::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* The circled-"i" hover-help icon (InfoTooltip.jsx) — a muted, low-key
+   trigger placed beside a heading/label, not glued onto the label text
+   itself. */
+.info-tooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink-muted);
+  color: var(--ink-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-style: italic;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1;
+  cursor: help;
+  vertical-align: middle;
+}
+
+.info-tooltip:hover,
+.info-tooltip:focus-visible {
+  border-color: var(--ink);
+  color: #ffffff;
+  background: var(--ink);
+}
+
+/* Fixed-position counterpart of the above, for elements inside a
+   scrolling container (see useHoverTooltip.js). */
+.hover-tip-fixed {
+  position: fixed;
+  z-index: 1000;
+  transform: translate(-50%, calc(-100% - 9px));
+  background: var(--ink);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.4;
+  padding: 7px 10px;
+  border-radius: 5px;
+  max-width: 280px;
+  white-space: normal;
+  pointer-events: none;
+}
+
+.hover-tip-fixed::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--ink);
+  margin-top: -1px;
 }
 
 /* ---- clickable conformance elements ---- */
@@ -424,6 +645,18 @@ body {
 
 .chevron--filter-match .chevron-shape polygon {
   stroke-width: 3;
+}
+
+.chevron--filter-exclude {
+  opacity: 0.55;
+}
+
+.chevron--filter-exclude .chevron-shape polygon {
+  stroke-dasharray: 4 3;
+}
+
+.chevron--filter-exclude .chevron-label {
+  text-decoration: line-through;
 }
 
 .chevron--first .chevron-label {
@@ -520,6 +753,7 @@ body {
   position: fixed;
   bottom: 16px;
   right: 16px;
+  z-index: 200;
 }
 
 .admin-toggle {

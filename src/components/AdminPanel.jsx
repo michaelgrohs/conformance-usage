@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { GROUPS, GROUP_LABELS } from '../data/variants.js'
+import InfoTooltip from './InfoTooltip.jsx'
 
 const ALL_GROUPS = [GROUPS.TRACE_ONLY, GROUPS.EVENT_LEVEL, GROUPS.PATTERN_LEVEL]
 
@@ -16,7 +17,7 @@ export default function AdminPanel({ group, onOverride, onResetToRandom }) {
         className="admin-toggle"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        title="Admin: override group assignment"
+        data-tooltip="Admin: override group assignment"
       >
         ⚙ Admin
       </button>
@@ -24,10 +25,14 @@ export default function AdminPanel({ group, onOverride, onResetToRandom }) {
         <div className="admin-drawer">
           <p className="admin-current">
             Current group: <strong>{GROUP_LABELS[group]}</strong>
+            <InfoTooltip
+              below
+              text="You can pick a representation below to preview it, instead of waiting for random assignment, then use Reset to random assignment to go back to picking a group at random."
+            />
           </p>
           <div className="admin-options">
             {ALL_GROUPS.map((g) => (
-              <label key={g} className="admin-option" title={`Switch to the ${GROUP_LABELS[g]} representation`}>
+              <label key={g} className="admin-option">
                 <input
                   type="radio"
                   name="group-override"
@@ -38,12 +43,7 @@ export default function AdminPanel({ group, onOverride, onResetToRandom }) {
               </label>
             ))}
           </div>
-          <button
-            type="button"
-            className="ghost-button admin-reset"
-            onClick={onResetToRandom}
-            title="Clear the manual override and resume random group assignment"
-          >
+          <button type="button" className="ghost-button admin-reset" onClick={onResetToRandom}>
             Reset to random assignment
           </button>
         </div>

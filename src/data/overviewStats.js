@@ -1,11 +1,19 @@
-// Fabricated-but-deterministic aggregate statistics for the overview
-// dashboard and the deviation/activity detail panels. See CLAUDE.md "Data
-// sourcing": none of this is real data — it exists to make the
-// Overview-First / Details-on-Demand UI demonstrable with numbers that
-// "appear realistic" (the user's own instruction). A small seeded
-// generator is used instead of Math.random() or hand-typed arrays, so the
-// numbers are stable across reloads/builds and easy to re-derive if the
-// targets change.
+// Fabricated-but-deterministic aggregate statistics for the
+// deviation/activity detail panels. See CLAUDE.md "Data sourcing": none of
+// this is real data — it exists to make the Details-on-Demand UI
+// demonstrable with numbers that "appear realistic" (the user's own
+// instruction). A small seeded generator is used instead of Math.random()
+// or hand-typed arrays, so the numbers are stable across reloads/builds
+// and easy to re-derive if the targets change.
+//
+// Unlike traceCollection.js, this file's stats (deviationStats,
+// activityStats) are intentionally NOT filterable — the activity/deviation
+// detail panels (DetailPanel.jsx) always show the same full-population
+// numbers regardless of the active activity filter. See CLAUDE.md
+// "Information architecture" for that scope decision.
+import { CONFORMING_AVG_THROUGHPUT_DAYS, CONFORMING_MEDIAN_THROUGHPUT_DAYS } from './traceCollection.js'
+
+export { CONFORMING_AVG_THROUGHPUT_DAYS, CONFORMING_MEDIAN_THROUGHPUT_DAYS }
 
 const HISTORY_DAYS = 21
 
@@ -60,23 +68,15 @@ function recentDates(days) {
 
 const dates = recentDates(HISTORY_DAYS)
 
-export const TOTAL_TRACES = 312
-export const CONFORMING_TRACES = 198
-export const DEVIATING_TRACES = TOTAL_TRACES - CONFORMING_TRACES // 114
-
-export const CONFORMING_AVG_THROUGHPUT_DAYS = 4.2
-export const CONFORMING_MEDIAN_THROUGHPUT_DAYS = 3.8
-
-// Overall conformance history: conforming vs. deviating trace counts per
-// day. Shown identically to all three groups (see CLAUDE.md "Information
-// architecture").
-const conformingDaily = distributeCount(CONFORMING_TRACES, HISTORY_DAYS, 11)
-const deviatingDaily = distributeCount(DEVIATING_TRACES, HISTORY_DAYS, 22)
-export const conformanceHistory = dates.map((date, i) => ({
-  date,
-  conforming: conformingDaily[i],
-  deviating: deviatingDaily[i],
-}))
+// TOTAL_TRACES/CONFORMING_TRACES/DEVIATING_TRACES and the actual
+// conformance history now live in traceCollection.js, which generates a
+// real per-trace dataset so the Overview dashboard can be filtered (see
+// filtering.js) rather than just displaying fixed totals. They're kept
+// here, unexported, only as the baseline used below to percentage-ize
+// deviationStats, which (like activityStats) intentionally stays
+// unfiltered — see CLAUDE.md "Information architecture".
+const TOTAL_TRACES = 312
+const DEVIATING_TRACES = 114
 
 // Per-deviation stats, keyed by the `deviationId` used in variants.js.
 // occurrences can exceed DEVIATING_TRACES in total across deviations, since
