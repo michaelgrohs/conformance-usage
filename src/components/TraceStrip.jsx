@@ -16,7 +16,7 @@ const NOTCH_PX = 14
 // instead of interlocking. Measuring real pixels keeps the notch depth
 // fixed regardless of label length, so every chevron lines up with its
 // neighbor exactly.
-function Chevron({ activity, isFirst, filterState }) {
+function Chevron({ activity, isFirst, filterState, onOpen }) {
   const ref = useRef(null)
   const [size, setSize] = useState(null)
 
@@ -42,7 +42,14 @@ function Chevron({ activity, isFirst, filterState }) {
   if (filterState === 'dim') classes.push('chevron--filter-dim')
 
   return (
-    <div className={classes.join(' ')} ref={ref}>
+    <div
+      className={classes.join(' ')}
+      ref={ref}
+      onClick={onOpen}
+      role="button"
+      tabIndex={0}
+      title={`Click for "${activity}"'s execution frequency across all traces`}
+    >
       {size && (
         <svg className="chevron-shape" width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true">
           <polygon points={points} />
@@ -53,31 +60,41 @@ function Chevron({ activity, isFirst, filterState }) {
   )
 }
 
-// `onOpenCase` surfaces the case-detail panel for the currently selected
-// variant — identical affordance/content across all three groups (see
-// CLAUDE.md "Information architecture"). `activityFilter` is the global
-// activity filter (see ActivityFilterBar) — matching activities are
-// highlighted, the rest faded, exactly mirroring how the process model
+// `onOpenActivity(name)` surfaces the same process-model-activity detail
+// (execution frequency) as clicking the activity in the process model —
+// identical affordance/content across all three groups (see CLAUDE.md
+// "Information architecture"). `onOpenTrace` surfaces the full trace
+// detail (its event list) via the explicit "Trace details →" button, kept
+// separate so the two click targets don't conflict. `activityFilter` is
+// the global activity filter (see ActivityFilterBar) — matching activities
+// are highlighted, the rest faded, exactly mirroring how the process model
 // responds to the same filter.
-export default function TraceStrip({ variant, onOpenCase, activityFilter = [] }) {
+export default function TraceStrip({ variant, onOpenActivity, onOpenTrace, activityFilter = [] }) {
   const hasFilter = activityFilter.length > 0
 
   return (
     <div className="panel trace-panel">
       <div className="panel-header">
         <h2>Recorded trace</h2>
-        <button type="button" className="ghost-button" onClick={onOpenCase}>
-          Case details →
+        <button
+          type="button"
+          className="ghost-button"
+          onClick={onOpenTrace}
+          title="Open this trace's full event list and throughput time"
+        >
+          Trace details →
         </button>
       </div>
+      <p className="panel-hint">Click an activity for its execution frequency.</p>
       <div className="chevron-scroll">
-        <div className="chevron-row" onClick={onOpenCase} role="button" tabIndex={0}>
+        <div className="chevron-row">
           {variant.trace.map((activity, i) => (
             <Chevron
               key={`${activity}-${i}`}
               activity={activity}
               isFirst={i === 0}
               filterState={!hasFilter ? null : activityFilter.includes(activity) ? 'match' : 'dim'}
+              onOpen={() => onOpenActivity(activity)}
             />
           ))}
         </div>

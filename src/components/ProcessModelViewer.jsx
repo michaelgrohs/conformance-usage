@@ -133,13 +133,18 @@ export default function ProcessModelViewer({ onOpenActivity, activityFilter = []
       <div className="panel-header">
         <h2>Process model</h2>
         <div className="zoom-controls">
-          <button type="button" className="ghost-button" onClick={() => zoomBy(1 / ZOOM_STEP)}>
+          <button type="button" className="ghost-button" onClick={() => zoomBy(1 / ZOOM_STEP)} title="Zoom out">
             −
           </button>
-          <button type="button" className="ghost-button" onClick={() => zoomBy(ZOOM_STEP)}>
+          <button type="button" className="ghost-button" onClick={() => zoomBy(ZOOM_STEP)} title="Zoom in">
             +
           </button>
-          <button type="button" className="ghost-button" onClick={resetZoom}>
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={resetZoom}
+            title="Reset pan and zoom to the default view"
+          >
             Reset view
           </button>
         </div>
@@ -148,7 +153,11 @@ export default function ProcessModelViewer({ onOpenActivity, activityFilter = []
         Drag to pan. Use the +/− buttons, or hold Ctrl (⌘ on Mac) while scrolling, to zoom. Click
         an activity for its execution frequency.
       </p>
-      <div className="bpmn-container" ref={containerRef} />
+      <div
+        className="bpmn-container"
+        ref={containerRef}
+        title="Click an activity for its execution frequency across all traces"
+      />
     </div>
   )
 }

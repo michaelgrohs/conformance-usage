@@ -60,18 +60,18 @@ function recentDates(days) {
 
 const dates = recentDates(HISTORY_DAYS)
 
-export const TOTAL_CASES = 312
-export const CONFORMING_CASES = 198
-export const DEVIATING_CASES = TOTAL_CASES - CONFORMING_CASES // 114
+export const TOTAL_TRACES = 312
+export const CONFORMING_TRACES = 198
+export const DEVIATING_TRACES = TOTAL_TRACES - CONFORMING_TRACES // 114
 
 export const CONFORMING_AVG_THROUGHPUT_DAYS = 4.2
 export const CONFORMING_MEDIAN_THROUGHPUT_DAYS = 3.8
 
-// Overall conformance history: conforming vs. deviating case counts per
+// Overall conformance history: conforming vs. deviating trace counts per
 // day. Shown identically to all three groups (see CLAUDE.md "Information
 // architecture").
-const conformingDaily = distributeCount(CONFORMING_CASES, HISTORY_DAYS, 11)
-const deviatingDaily = distributeCount(DEVIATING_CASES, HISTORY_DAYS, 22)
+const conformingDaily = distributeCount(CONFORMING_TRACES, HISTORY_DAYS, 11)
+const deviatingDaily = distributeCount(DEVIATING_TRACES, HISTORY_DAYS, 22)
 export const conformanceHistory = dates.map((date, i) => ({
   date,
   conforming: conformingDaily[i],
@@ -79,8 +79,8 @@ export const conformanceHistory = dates.map((date, i) => ({
 }))
 
 // Per-deviation stats, keyed by the `deviationId` used in variants.js.
-// occurrences can exceed DEVIATING_CASES in total across deviations, since
-// a single case can exhibit more than one deviation — realistic for a
+// occurrences can exceed DEVIATING_TRACES in total across deviations, since
+// a single trace can exhibit more than one deviation — realistic for a
 // process with several independent failure modes.
 const deviationDefs = [
   { id: 'insert-change-order', label: 'Insert — ⟨Change Order, Change Order⟩', occurrences: 22, avgThroughput: 5.1, seed: 101, spikeDays: [] },
@@ -100,8 +100,8 @@ export const deviationStats = Object.fromEntries(
         id: d.id,
         label: d.label,
         occurrences: d.occurrences,
-        percentOfDeviating: Math.round((d.occurrences / DEVIATING_CASES) * 1000) / 10,
-        percentOfAll: Math.round((d.occurrences / TOTAL_CASES) * 1000) / 10,
+        percentOfDeviating: Math.round((d.occurrences / DEVIATING_TRACES) * 1000) / 10,
+        percentOfAll: Math.round((d.occurrences / TOTAL_TRACES) * 1000) / 10,
         avgThroughputDays: d.avgThroughput,
         throughputDeltaDays: Math.round((d.avgThroughput - CONFORMING_AVG_THROUGHPUT_DAYS) * 10) / 10,
         history: dates.map((date, i) => ({ date, count: daily[i] })),
@@ -114,17 +114,17 @@ export const deviationStats = Object.fromEntries(
 // process-model click-to-detail panel. Shared identically across all three
 // groups (not deviation-specific).
 export const activityStats = {
-  'Create Order': { executions: 312, percentOfCases: 100 },
-  'Check Order': { executions: 281, percentOfCases: 90.1 },
-  'Request Materials': { executions: 31, percentOfCases: 9.9 },
-  'Approve Order': { executions: 312, percentOfCases: 100 },
-  'Order Materials': { executions: 134, percentOfCases: 42.9 },
-  'Adjust Materials': { executions: 26, percentOfCases: 8.3 },
-  'Assemble Products': { executions: 297, percentOfCases: 95.2 },
-  'Send Invoice': { executions: 297, percentOfCases: 95.2 },
-  'Send Reminder': { executions: 58, percentOfCases: 18.6 },
-  'Ship Order': { executions: 331, percentOfCases: 106.1 },
-  'Clear Invoice': { executions: 312, percentOfCases: 100 },
-  'Archive Check': { executions: 312, percentOfCases: 100 },
-  'Change Order': { executions: 44, percentOfCases: 14.1 },
+  'Create Order': { executions: 312, percentOfTraces: 100 },
+  'Check Order': { executions: 281, percentOfTraces: 90.1 },
+  'Request Materials': { executions: 31, percentOfTraces: 9.9 },
+  'Approve Order': { executions: 312, percentOfTraces: 100 },
+  'Order Materials': { executions: 134, percentOfTraces: 42.9 },
+  'Adjust Materials': { executions: 26, percentOfTraces: 8.3 },
+  'Assemble Products': { executions: 297, percentOfTraces: 95.2 },
+  'Send Invoice': { executions: 297, percentOfTraces: 95.2 },
+  'Send Reminder': { executions: 58, percentOfTraces: 18.6 },
+  'Ship Order': { executions: 331, percentOfTraces: 106.1 },
+  'Clear Invoice': { executions: 312, percentOfTraces: 100 },
+  'Archive Check': { executions: 312, percentOfTraces: 100 },
+  'Change Order': { executions: 44, percentOfTraces: 14.1 },
 }

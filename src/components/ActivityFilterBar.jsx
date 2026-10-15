@@ -14,10 +14,16 @@ export default function ActivityFilterBar({ selected, onToggle, onClear }) {
   return (
     <div className="panel filter-bar">
       <div className="filter-bar-row">
-        <span className="filter-bar-label">Filter activities:</span>
+        <span
+          className="filter-bar-label"
+          title="Highlight activities in the process model and the recorded trace, and fade everything else. Applies to every trace variant and group."
+        >
+          Filter activities:
+        </span>
         <select
           className="filter-bar-select"
           value=""
+          title="Add an activity to the filter"
           onChange={(e) => {
             if (e.target.value) onToggle(e.target.value)
           }}
@@ -30,7 +36,7 @@ export default function ActivityFilterBar({ selected, onToggle, onClear }) {
           ))}
         </select>
         {selected.length > 0 && (
-          <button type="button" className="ghost-button" onClick={onClear}>
+          <button type="button" className="ghost-button" onClick={onClear} title="Remove all activity filters">
             Clear all
           </button>
         )}
@@ -38,7 +44,13 @@ export default function ActivityFilterBar({ selected, onToggle, onClear }) {
       {selected.length > 0 && (
         <div className="filter-chip-row">
           {selected.map((a) => (
-            <button type="button" className="filter-chip" key={a} onClick={() => onToggle(a)}>
+            <button
+              type="button"
+              className="filter-chip"
+              key={a}
+              onClick={() => onToggle(a)}
+              title={`Remove "${a}" from the filter`}
+            >
               {a} <span aria-hidden="true">×</span>
             </button>
           ))}

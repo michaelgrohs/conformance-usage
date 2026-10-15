@@ -20,6 +20,7 @@ function EventLevelView({ variant, onOpenDeviation }) {
                   key={i}
                   className={move.deviationId ? 'is-clickable' : undefined}
                   onClick={move.deviationId ? () => onOpenDeviation(move.deviationId) : undefined}
+                  title={move.deviationId ? 'Click for this deviation’s frequency, history, and throughput impact' : undefined}
                 >
                   {move.trace}
                 </td>
@@ -32,6 +33,7 @@ function EventLevelView({ variant, onOpenDeviation }) {
                   key={i}
                   className={move.deviationId ? 'is-clickable' : undefined}
                   onClick={move.deviationId ? () => onOpenDeviation(move.deviationId) : undefined}
+                  title={move.deviationId ? 'Click for this deviation’s frequency, history, and throughput impact' : undefined}
                 >
                   {move.model}
                 </td>
@@ -85,12 +87,17 @@ function PatternPartText({ parts }) {
 // as the corresponding event-level move pair (same deviationId).
 function PatternLevelView({ variant, onOpenDeviation }) {
   if (variant.patternLevelDeviations.length === 0) {
-    return <p className="panel-empty">No deviations were found — this case conforms to the process model.</p>
+    return <p className="panel-empty">No deviations were found — this trace conforms to the process model.</p>
   }
   return (
     <div className="pattern-list">
       {variant.patternLevelDeviations.map((d) => (
-        <div className="pattern-row is-clickable" key={d.id} onClick={() => onOpenDeviation(d.id)}>
+        <div
+          className="pattern-row is-clickable"
+          key={d.id}
+          onClick={() => onOpenDeviation(d.id)}
+          title="Click for this deviation's frequency, history, and throughput impact"
+        >
           <span className="pattern-label">{d.pattern}</span>
           <span className="pattern-divider" />
           <span className="pattern-description">

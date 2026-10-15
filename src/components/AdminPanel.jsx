@@ -27,7 +27,7 @@ export default function AdminPanel({ group, onOverride, onResetToRandom }) {
           </p>
           <div className="admin-options">
             {ALL_GROUPS.map((g) => (
-              <label key={g} className="admin-option">
+              <label key={g} className="admin-option" title={`Switch to the ${GROUP_LABELS[g]} representation`}>
                 <input
                   type="radio"
                   name="group-override"
@@ -38,7 +38,12 @@ export default function AdminPanel({ group, onOverride, onResetToRandom }) {
               </label>
             ))}
           </div>
-          <button type="button" className="ghost-button admin-reset" onClick={onResetToRandom}>
+          <button
+            type="button"
+            className="ghost-button admin-reset"
+            onClick={onResetToRandom}
+            title="Clear the manual override and resume random group assignment"
+          >
             Reset to random assignment
           </button>
         </div>

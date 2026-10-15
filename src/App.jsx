@@ -39,17 +39,18 @@ export default function App() {
       <main className="app-main">
         <ActivityFilterBar selected={activityFilter} onToggle={toggleActivityFilter} onClear={clearActivityFilter} />
 
+        <OverviewStats />
+
         <ProcessModelViewer
           onOpenActivity={(name) => setSelection({ type: 'activity', id: name })}
           activityFilter={activityFilter}
         />
 
-        <OverviewStats />
-
         <TraceSelector selectedId={variantId} onChange={setVariantId} />
         <TraceStrip
           variant={variant}
-          onOpenCase={() => setSelection({ type: 'case', id: variantId })}
+          onOpenActivity={(name) => setSelection({ type: 'activity', id: name })}
+          onOpenTrace={() => setSelection({ type: 'trace', id: variantId })}
           activityFilter={activityFilter}
         />
 

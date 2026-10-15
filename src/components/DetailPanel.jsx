@@ -1,6 +1,6 @@
 import { variants } from '../data/variants.js'
 import { activityStats, deviationStats, CONFORMING_AVG_THROUGHPUT_DAYS } from '../data/overviewStats.js'
-import { getCaseTimeline, formatOffset } from '../data/caseTimelines.js'
+import { getTraceTimeline, formatOffset } from '../data/traceTimelines.js'
 import { SingleHistoryChart } from './HistoryChart.jsx'
 
 function ActivityDetail({ activityName }) {
@@ -16,8 +16,8 @@ function ActivityDetail({ activityName }) {
             <div className="stat-label">Executions (last 21 days)</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value">{stats.percentOfCases}%</div>
-            <div className="stat-label">Of cases{stats.percentOfCases > 100 ? ' (some repeat this step)' : ''}</div>
+            <div className="stat-value">{stats.percentOfTraces}%</div>
+            <div className="stat-label">Of traces{stats.percentOfTraces > 100 ? ' (some repeat this step)' : ''}</div>
           </div>
         </div>
       ) : (
@@ -27,17 +27,17 @@ function ActivityDetail({ activityName }) {
   )
 }
 
-function CaseDetail({ variantId }) {
+function TraceDetail({ variantId }) {
   const variant = variants[variantId]
-  const { totalDays, events } = getCaseTimeline(variantId, variant.trace)
+  const { totalDays, events } = getTraceTimeline(variantId, variant.trace)
   return (
     <>
       <h3 className="detail-title">{variant.label}</h3>
-      <p className="detail-kicker">Case</p>
+      <p className="detail-kicker">Trace</p>
       <div className="stat-cards stat-cards--detail">
         <div className="stat-card">
           <div className="stat-value">{totalDays.toFixed(1)}d</div>
-          <div className="stat-label">Case throughput</div>
+          <div className="stat-label">Trace throughput</div>
         </div>
         <div className="stat-card">
           <div className="stat-value">{events.length}</div>
@@ -79,11 +79,11 @@ function DeviationDetail({ deviationId }) {
         </div>
         <div className="stat-card">
           <div className="stat-value">{stats.percentOfDeviating}%</div>
-          <div className="stat-label">Of deviating cases</div>
+          <div className="stat-label">Of deviating traces</div>
         </div>
         <div className="stat-card">
           <div className="stat-value">{stats.percentOfAll}%</div>
-          <div className="stat-label">Of all cases</div>
+          <div className="stat-label">Of all traces</div>
         </div>
       </div>
 
@@ -93,7 +93,7 @@ function DeviationDetail({ deviationId }) {
       <h4 className="subsection-title">Throughput time</h4>
       <div className="throughput-compare">
         <div className="throughput-row">
-          <span className="throughput-label">Conforming cases</span>
+          <span className="throughput-label">Conforming traces</span>
           <div className="throughput-bar-track">
             <div
               className="throughput-bar throughput-bar--conforming"
@@ -103,7 +103,7 @@ function DeviationDetail({ deviationId }) {
           <span className="throughput-value">{CONFORMING_AVG_THROUGHPUT_DAYS}d</span>
         </div>
         <div className="throughput-row">
-          <span className="throughput-label">Cases with this deviation</span>
+          <span className="throughput-label">Traces with this deviation</span>
           <div className="throughput-bar-track">
             <div
               className="throughput-bar throughput-bar--deviating"
@@ -115,8 +115,8 @@ function DeviationDetail({ deviationId }) {
       </div>
       <p className="panel-hint">
         {worseBy > 0
-          ? `Cases with this deviation take ${worseBy}d longer on average than conforming cases.`
-          : `Cases with this deviation are not slower, on average, than conforming cases.`}
+          ? `Traces with this deviation take ${worseBy}d longer on average than conforming traces.`
+          : `Traces with this deviation are not slower, on average, than conforming traces.`}
       </p>
     </>
   )
@@ -134,7 +134,7 @@ export default function DetailPanel({ selection, onClose }) {
           ×
         </button>
         {selection.type === 'activity' && <ActivityDetail activityName={selection.id} />}
-        {selection.type === 'case' && <CaseDetail variantId={selection.id} />}
+        {selection.type === 'trace' && <TraceDetail variantId={selection.id} />}
         {selection.type === 'deviation' && <DeviationDetail deviationId={selection.id} />}
       </div>
     </div>

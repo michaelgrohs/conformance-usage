@@ -1,4 +1,4 @@
-// Fabricated per-case event timelines for the "click a trace" detail panel.
+// Fabricated per-trace event timelines for the "click a trace" detail panel.
 // See overviewStats.js / CLAUDE.md — same rationale: deterministic, seeded,
 // not real data.
 import { VARIANT_IDS } from './variants.js'
@@ -34,10 +34,10 @@ export function formatOffset(hours) {
   return h === 0 ? `+${d}d` : `+${d}d ${h}h`
 }
 
-// Total case duration (days) and a seed per variant, chosen to be roughly
+// Total trace duration (days) and a seed per variant, chosen to be roughly
 // consistent with that variant's deviations being worse than the
 // conforming baseline (4.2 days).
-const CASE_DURATION_DAYS = {
+const TRACE_DURATION_DAYS = {
   [VARIANT_IDS.DEVIATION_A]: 7.0,
   [VARIANT_IDS.DEVIATION_B]: 6.5,
   [VARIANT_IDS.CONFORMANT]: 4.0,
@@ -49,8 +49,8 @@ const SEEDS = {
   [VARIANT_IDS.CONFORMANT]: 73,
 }
 
-export function getCaseTimeline(variantId, trace) {
-  const totalDays = CASE_DURATION_DAYS[variantId] ?? 5
+export function getTraceTimeline(variantId, trace) {
+  const totalDays = TRACE_DURATION_DAYS[variantId] ?? 5
   const offsets = buildOffsets(trace.length, totalDays, SEEDS[variantId] ?? 70)
   return {
     totalDays,
