@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { GROUP_LABELS, GROUPS, VARIANT_IDS, variants } from './data/variants.js'
 import { useGroupAssignment } from './hooks/useGroupAssignment.js'
 import ProcessModelViewer from './components/ProcessModelViewer.jsx'
 import OverviewStats from './components/OverviewStats.jsx'
+import ActivityFilterBar from './components/ActivityFilterBar.jsx'
 import TraceSelector from './components/TraceSelector.jsx'
 import TraceStrip from './components/TraceStrip.jsx'
 import ConformancePanel from './components/ConformancePanel.jsx'
@@ -13,6 +14,15 @@ export default function App() {
   const { group, overrideGroup, resetToRandom } = useGroupAssignment()
   const [variantId, setVariantId] = useState(VARIANT_IDS.DEVIATION_A)
   const [selection, setSelection] = useState(null)
+  // Global activity filter — applies identically to the process model and
+  // the recorded trace, regardless of variant/group. See CLAUDE.md
+  // "Information architecture".
+  const [activityFilter, setActivityFilter] = useState([])
+
+  const toggleActivityFilter = useCallback((name) => {
+    setActivityFilter((prev) => (prev.includes(name) ? prev.filter((a) => a !== name) : [...prev, name]))
+  }, [])
+  const clearActivityFilter = useCallback(() => setActivityFilter([]), [])
 
   const variant = variants[variantId]
 
@@ -27,12 +37,21 @@ export default function App() {
       </header>
 
       <main className="app-main">
-        <ProcessModelViewer onOpenActivity={(name) => setSelection({ type: 'activity', id: name })} />
+        <ActivityFilterBar selected={activityFilter} onToggle={toggleActivityFilter} onClear={clearActivityFilter} />
+
+        <ProcessModelViewer
+          onOpenActivity={(name) => setSelection({ type: 'activity', id: name })}
+          activityFilter={activityFilter}
+        />
 
         <OverviewStats />
 
         <TraceSelector selectedId={variantId} onChange={setVariantId} />
-        <TraceStrip variant={variant} onOpenCase={() => setSelection({ type: 'case', id: variantId })} />
+        <TraceStrip
+          variant={variant}
+          onOpenCase={() => setSelection({ type: 'case', id: variantId })}
+          activityFilter={activityFilter}
+        />
 
         {group !== GROUPS.TRACE_ONLY && (
           <ConformancePanel

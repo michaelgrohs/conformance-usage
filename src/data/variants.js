@@ -35,10 +35,12 @@ export const VARIANT_IDS = {
 }
 
 export const variants = {
+  // Source: Qualtrics export, "Order-to-cash – Deviation Identification
+  // Task" (see CLAUDE.md "Data sourcing"). Not exposed anywhere in the UI —
+  // keep it that way; no field on this object should surface that text.
   [VARIANT_IDS.DEVIATION_A]: {
     id: VARIANT_IDS.DEVIATION_A,
     label: 'Variant 1',
-    source: 'Qualtrics export: "Order-to-cash – Deviation Identification Task"',
     conforming: false,
     trace: [
       'Create Order',
@@ -99,10 +101,11 @@ export const variants = {
     ],
   },
 
+  // Source: Qualtrics export, "Order-to-cash – Correction Proposal Task"
+  // (see CLAUDE.md "Data sourcing"). Not exposed anywhere in the UI.
   [VARIANT_IDS.DEVIATION_B]: {
     id: VARIANT_IDS.DEVIATION_B,
     label: 'Variant 2',
-    source: 'Qualtrics export: "Order-to-cash – Correction Proposal Task"',
     conforming: false,
     trace: [
       'Create Order',
@@ -163,10 +166,11 @@ export const variants = {
     ],
   },
 
+  // Source: fabricated — a short valid execution of the model (no optional
+  // back-order/reminder). Not exposed anywhere in the UI.
   [VARIANT_IDS.CONFORMANT]: {
     id: VARIANT_IDS.CONFORMANT,
     label: 'Variant 3',
-    source: 'Fabricated: a short valid execution of the model (no optional back-order/reminder)',
     conforming: true,
     trace: [
       'Create Order',
