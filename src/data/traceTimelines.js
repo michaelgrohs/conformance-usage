@@ -35,18 +35,22 @@ export function formatOffset(hours) {
 }
 
 // Total trace duration (days) and a seed per variant, chosen to be roughly
-// consistent with that variant's deviations being worse than the
-// conforming baseline (4.2 days).
+// consistent with that variant's deviations relative to the conforming
+// baseline (4.2 days).
 const TRACE_DURATION_DAYS = {
   [VARIANT_IDS.DEVIATION_A]: 7.0,
   [VARIANT_IDS.DEVIATION_B]: 6.5,
   [VARIANT_IDS.CONFORMANT]: 4.0,
+  [VARIANT_IDS.DEVIATION_C]: 5.2,
+  [VARIANT_IDS.DEVIATION_D]: 9.5,
 }
 
 const SEEDS = {
   [VARIANT_IDS.DEVIATION_A]: 71,
   [VARIANT_IDS.DEVIATION_B]: 72,
   [VARIANT_IDS.CONFORMANT]: 73,
+  [VARIANT_IDS.DEVIATION_C]: 74,
+  [VARIANT_IDS.DEVIATION_D]: 75,
 }
 
 export function getTraceTimeline(variantId, trace) {

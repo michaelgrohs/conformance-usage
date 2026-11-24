@@ -17,7 +17,7 @@ function ActivityDetail({ activityName }) {
           </div>
           <div className="stat-card">
             <div className="stat-value">{stats.percentOfTraces}%</div>
-            <div className="stat-label">Of traces{stats.percentOfTraces > 100 ? ' (some repeat this step)' : ''}</div>
+            <div className="stat-label">Of traces{stats.executions > stats.tracesWithActivity ? ' (some repeat this step)' : ''}</div>
           </div>
         </div>
       ) : (

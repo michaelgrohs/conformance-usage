@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
 import { computeFilteredOverview } from '../data/filtering.js'
+import { TOTAL_TRACES } from '../data/traceCollection.js'
 import { ConformanceRateChart } from './HistoryChart.jsx'
 
-const UNFILTERED_TOTAL = 312
+const UNFILTERED_TOTAL = TOTAL_TRACES
 
 // The aggregate dashboard shown first, identically to all three groups —
 // see CLAUDE.md "Information architecture: Overview → Zoom → Filter →

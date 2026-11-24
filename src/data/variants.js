@@ -1,5 +1,5 @@
-// The three order-to-cash trace variants available in the tool, selectable
-// via the dropdown as "Variant 1/2/3" — deliberately neutral labels, since
+// The five order-to-cash trace variants available in the tool, selectable
+// via the dropdown as "Variant 1–5" — deliberately neutral labels, since
 // the dropdown must not reveal which variants conform or deviate (that's
 // conformance information, which only belongs in the "Conformance checking
 // results" panel — see CLAUDE.md). See CLAUDE.md "Data sourcing" for exact
@@ -32,6 +32,8 @@ export const VARIANT_IDS = {
   DEVIATION_A: 'deviation-a',
   DEVIATION_B: 'deviation-b',
   CONFORMANT: 'conformant',
+  DEVIATION_C: 'deviation-c',
+  DEVIATION_D: 'deviation-d',
 }
 
 export const variants = {
@@ -193,6 +195,123 @@ export const variants = {
       { trace: 'Clear Invoice', model: 'Clear Invoice', moveType: 'sync' },
     ],
     patternLevelDeviations: [],
+  },
+  // Source: fabricated — not from the Qualtrics export. Several deviations,
+  // all procedural (a repeated check, an extra order change before the
+  // check, an extra materials request). Not exposed anywhere in the UI.
+  [VARIANT_IDS.DEVIATION_C]: {
+    id: VARIANT_IDS.DEVIATION_C,
+    label: 'Variant 4',
+    conforming: false,
+    trace: [
+      'Create Order',
+      'Change Order',
+      'Check Order',
+      'Check Order',
+      'Approve Order',
+      'Archive Check',
+      'Order Materials',
+      'Request Materials',
+      'Assemble Products',
+      'Send Invoice',
+      'Ship Order',
+      'Clear Invoice',
+    ],
+    eventLevelAlignment: [
+      { trace: 'Create Order', model: 'Create Order', moveType: 'sync' },
+      { trace: 'Change Order', model: '>>', moveType: 'log', deviationId: 'insert-change-order-single' },
+      { trace: 'Check Order', model: 'Check Order', moveType: 'sync' },
+      { trace: 'Check Order', model: '>>', moveType: 'log', deviationId: 'repeat-check-order' },
+      { trace: 'Approve Order', model: 'Approve Order', moveType: 'sync' },
+      { trace: 'Archive Check', model: 'Archive Check', moveType: 'sync' },
+      { trace: 'Order Materials', model: 'Order Materials', moveType: 'sync' },
+      { trace: 'Request Materials', model: '>>', moveType: 'log', deviationId: 'insert-request-materials' },
+      { trace: 'Assemble Products', model: 'Assemble Products', moveType: 'sync' },
+      { trace: 'Send Invoice', model: 'Send Invoice', moveType: 'sync' },
+      { trace: 'Ship Order', model: 'Ship Order', moveType: 'sync' },
+      { trace: 'Clear Invoice', model: 'Clear Invoice', moveType: 'sync' },
+    ],
+    patternLevelDeviations: [
+      {
+        id: 'insert-change-order-single',
+        pattern: 'Insert',
+        parts: [
+          { text: 'Change Order', style: 'i' },
+          { text: ' is ', style: '' },
+          { text: 'inserted', style: 'u' },
+        ],
+      },
+      {
+        id: 'repeat-check-order',
+        pattern: 'Repeat',
+        parts: [
+          { text: 'Check Order', style: 'i' },
+          { text: ' is ', style: '' },
+          { text: 'repeated', style: 'u' },
+        ],
+      },
+      {
+        id: 'insert-request-materials',
+        pattern: 'Insert',
+        parts: [
+          { text: 'Request Materials', style: 'i' },
+          { text: ' is ', style: '' },
+          { text: 'inserted', style: 'u' },
+        ],
+      },
+    ],
+  },
+
+  // Source: fabricated — not from the Qualtrics export. Fewer deviations
+  // than Variant 4, but control-relevant ones: the order is never approved,
+  // and the invoice is never cleared despite reminders (the reminder loop
+  // itself is allowed by the model). Not exposed anywhere in the UI.
+  [VARIANT_IDS.DEVIATION_D]: {
+    id: VARIANT_IDS.DEVIATION_D,
+    label: 'Variant 5',
+    conforming: false,
+    trace: [
+      'Create Order',
+      'Check Order',
+      'Archive Check',
+      'Assemble Products',
+      'Send Invoice',
+      'Send Reminder',
+      'Send Reminder',
+      'Ship Order',
+    ],
+    eventLevelAlignment: [
+      { trace: 'Create Order', model: 'Create Order', moveType: 'sync' },
+      { trace: 'Check Order', model: 'Check Order', moveType: 'sync' },
+      { trace: '>>', model: 'Approve Order', moveType: 'model', deviationId: 'skip-approve-order' },
+      { trace: 'Archive Check', model: 'Archive Check', moveType: 'sync' },
+      { trace: 'Assemble Products', model: 'Assemble Products', moveType: 'sync' },
+      { trace: 'Send Invoice', model: 'Send Invoice', moveType: 'sync' },
+      { trace: 'Send Reminder', model: 'Send Reminder', moveType: 'sync' },
+      { trace: 'Send Reminder', model: 'Send Reminder', moveType: 'sync' },
+      { trace: 'Ship Order', model: 'Ship Order', moveType: 'sync' },
+      { trace: '>>', model: 'Clear Invoice', moveType: 'model', deviationId: 'skip-clear-invoice' },
+    ],
+    patternLevelDeviations: [
+      {
+        id: 'skip-approve-order',
+        pattern: 'Skip',
+        parts: [
+          { text: 'Approve Order', style: 'i' },
+          { text: ' is ', style: '' },
+          { text: 'skipped', style: 'u' },
+        ],
+      },
+      {
+        id: 'skip-clear-invoice',
+        pattern: 'Skip',
+        parts: [
+          { text: 'Clear Invoice', style: 'i' },
+          { text: ' is ', style: '' },
+          { text: 'skipped', style: 'u' },
+        ],
+      },
+    ],
   },
 }
 

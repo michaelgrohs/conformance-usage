@@ -7,7 +7,7 @@ import { variantList } from './variants.js'
 // the moment it fails one condition; this is real narrowing, not a
 // highlight-only overlay (see CLAUDE.md "Information architecture" /
 // "Filter"). Used identically against the fabricated 312-trace collection
-// (for the Overview dashboard) and the 3 explorable trace variants (for
+// (for the Overview dashboard) and the 5 explorable trace variants (for
 // the trace selector) — same conditions, same semantics, in both places.
 export function matchesConditions(activitySet, conditions) {
   return conditions.every((c) => (c.mode === 'exclude' ? !activitySet.has(c.activity) : activitySet.has(c.activity)))
@@ -38,7 +38,7 @@ export function computeFilteredOverview(conditions) {
   return { total, conformingCount, deviatingCount, avgThroughputDays, history }
 }
 
-// The explorable trace variants (Variant 1/2/3) that satisfy `conditions`,
+// The explorable trace variants (Variant 1–5) that satisfy `conditions`,
 // matched against each variant's own set of activities (deduped from its
 // recorded trace).
 export function matchingVariants(conditions) {

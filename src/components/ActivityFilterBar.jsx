@@ -1,10 +1,11 @@
 import { activityStats } from '../data/overviewStats.js'
 import { computeFilteredOverview, matchingVariants } from '../data/filtering.js'
+import { TOTAL_TRACES } from '../data/traceCollection.js'
 import { variantList } from '../data/variants.js'
 import InfoTooltip from './InfoTooltip.jsx'
 
 const ALL_ACTIVITIES = Object.keys(activityStats)
-const UNFILTERED_TOTAL = 312
+const UNFILTERED_TOTAL = TOTAL_TRACES
 
 // A global filter, noted here at the top of the page and applied
 // identically to the process model and the recorded trace below (see
