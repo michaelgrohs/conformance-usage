@@ -132,7 +132,7 @@ export default function AdminPanel({ group, source, participant, onOverride, onR
                 type="button"
                 className="ghost-button admin-reset"
                 onClick={onResetToAutomatic}
-                data-tooltip="Removes the manual choice: the group then comes from the participant number in the link, or is drawn at random if there is none."
+                data-tooltip="Removes the manual choice: the group then comes from the participant number in the link, or, if the link has no number, a new random group is drawn."
               >
                 Back to automatic assignment
               </button>

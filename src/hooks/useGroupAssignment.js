@@ -8,7 +8,10 @@ import { ALL_GROUPS, groupForParticipant, parseParticipantNumber, randomGroup } 
 // See assignment.js and CLAUDE.md "Group assignment".
 
 const OVERRIDE_KEY = 'conformance-tool:group-override'
-const RANDOM_KEY = 'conformance-tool:group'
+// New name on purpose: the old admin panel stored manual choices under
+// 'conformance-tool:group', so values left there from older sessions must not
+// be mistaken for a random draw.
+const RANDOM_KEY = 'conformance-tool:random-group'
 
 function read(key) {
   try {
@@ -29,12 +32,12 @@ function write(key, value) {
   }
 }
 
-function automaticAssignment() {
+function automaticAssignment({ redraw = false } = {}) {
   const participant = parseParticipantNumber(window.location.search)
   if (participant != null) {
     return { group: groupForParticipant(participant), source: 'participant', participant }
   }
-  let group = read(RANDOM_KEY)
+  let group = redraw ? null : read(RANDOM_KEY)
   if (!group) {
     group = randomGroup()
     write(RANDOM_KEY, group)
@@ -57,12 +60,12 @@ export function useGroupAssignment() {
     setState((s) => ({ ...s, group: next, source: 'override' }))
   }, [])
 
-  // Drops the override and goes back to the automatic assignment (the
-  // participant number if the link has one, otherwise the session's random
-  // draw).
+  // Drops the override and goes back to the automatic assignment: the
+  // participant number's group if the link has one, otherwise a fresh
+  // random draw.
   const resetToAutomatic = useCallback(() => {
     write(OVERRIDE_KEY, null)
-    setState(automaticAssignment())
+    setState(automaticAssignment({ redraw: true }))
   }, [])
 
   return { ...state, overrideGroup, resetToAutomatic }
