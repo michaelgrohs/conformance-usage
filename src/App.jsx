@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { GROUP_LABELS, GROUPS, VARIANT_IDS, variants } from './data/variants.js'
+import { GROUPS, VARIANT_IDS, variants } from './data/variants.js'
 import { matchingVariants } from './data/filtering.js'
 import { useGroupAssignment } from './hooks/useGroupAssignment.js'
 import ProcessModelViewer from './components/ProcessModelViewer.jsx'
@@ -12,7 +12,7 @@ import DetailPanel from './components/DetailPanel.jsx'
 import AdminPanel from './components/AdminPanel.jsx'
 
 export default function App() {
-  const { group, overrideGroup, resetToRandom } = useGroupAssignment()
+  const { group, source, participant, overrideGroup, resetToAutomatic } = useGroupAssignment()
   const [variantId, setVariantId] = useState(VARIANT_IDS.DEVIATION_A)
   const [selection, setSelection] = useState(null)
   // Global activity filter — a list of `{ activity, mode }` AND/NOT
@@ -57,7 +57,6 @@ export default function App() {
           <h1>Conformance Checking Explorer</h1>
           <p className="subtitle">Order-to-cash process</p>
         </div>
-        <span className="group-badge">{GROUP_LABELS[group]}</span>
       </header>
 
       <main className="app-main">
@@ -104,7 +103,7 @@ export default function App() {
 
       <DetailPanel selection={selection} onClose={() => setSelection(null)} />
 
-      <AdminPanel group={group} onOverride={overrideGroup} onResetToRandom={resetToRandom} />
+      <AdminPanel group={group} source={source} participant={participant} onOverride={overrideGroup} onResetToAutomatic={resetToAutomatic} />
     </div>
   )
 }

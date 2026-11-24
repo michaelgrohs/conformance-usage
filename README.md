@@ -23,10 +23,34 @@ npm run build
 npm run preview
 ```
 
-## Overriding the group
+## Group assignment and participant links
 
-Use the "⚙ Admin" control in the bottom-right corner to force a specific
-group or reset to a fresh random assignment.
+Each participant gets a personal link with their participant number:
+
+    https://michaelgrohs.github.io/conformance-usage/?p=7
+
+The group follows automatically from the number (block randomisation in
+blocks of three, so group sizes never differ by more than 1 as long as
+numbers are handed out in order without gaps). A link without `?p=` falls
+back to a random group for that browser session.
+
+## Settings / admin (password-protected)
+
+The gear icon in the bottom-right corner opens a password prompt. Once
+unlocked, you can see the current group and how it was assigned, switch the
+tab to another group, go back to automatic assignment, and look up the link
+and group for any participant number.
+
+Set or change the password (stores only its SHA-256 hash in
+`src/config.js`, which ends up in the public bundle):
+
+```bash
+npm run set-admin-password -- "your password"
+```
+
+Then rebuild/push. While no password is set, the settings can't be
+unlocked. This is a client-side check on a static site: it keeps
+participants from switching groups, it isn't real security.
 
 ## Hosted version
 

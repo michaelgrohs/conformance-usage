@@ -1,56 +1,69 @@
 import { useCallback, useState } from 'react'
-import { GROUPS } from '../data/variants.js'
+import { ALL_GROUPS, groupForParticipant, parseParticipantNumber, randomGroup } from '../data/assignment.js'
 
-const STORAGE_KEY = 'conformance-tool:group'
-const ALL_GROUPS = [GROUPS.TRACE_ONLY, GROUPS.EVENT_LEVEL, GROUPS.PATTERN_LEVEL]
+// Which group this browser tab shows, in order of precedence:
+// 1. an admin override (set in the password-protected settings panel),
+// 2. the participant number in the link (?p=N) → block randomisation,
+// 3. otherwise a random group, drawn once and kept for the browser session.
+// See assignment.js and CLAUDE.md "Group assignment".
 
-function randomGroup() {
-  return ALL_GROUPS[Math.floor(Math.random() * ALL_GROUPS.length)]
-}
+const OVERRIDE_KEY = 'conformance-tool:group-override'
+const RANDOM_KEY = 'conformance-tool:group'
 
-function readStoredGroup() {
+function read(key) {
   try {
-    const stored = sessionStorage.getItem(STORAGE_KEY)
-    return ALL_GROUPS.includes(stored) ? stored : null
+    const v = sessionStorage.getItem(key)
+    return ALL_GROUPS.includes(v) ? v : null
   } catch {
-    // sessionStorage can be unavailable (e.g. private browsing); fall back
-    // to an in-memory assignment for this render.
     return null
   }
 }
 
-function writeStoredGroup(group) {
+function write(key, value) {
   try {
-    sessionStorage.setItem(STORAGE_KEY, group)
+    if (value == null) sessionStorage.removeItem(key)
+    else sessionStorage.setItem(key, value)
   } catch {
-    // ignore — assignment still works for this session, just won't persist
+    // sessionStorage unavailable (e.g. some private modes): assignment still
+    // works for this page view, it just won't survive a reload.
   }
 }
 
-// Default behaviour: assign a group uniformly at random on first load, then
-// keep it stable for the rest of the browser session (so reloading the page
-// doesn't reassign a different condition mid-session). The admin panel can
-// override this assignment explicitly, or reset back to a fresh random draw.
+function automaticAssignment() {
+  const participant = parseParticipantNumber(window.location.search)
+  if (participant != null) {
+    return { group: groupForParticipant(participant), source: 'participant', participant }
+  }
+  let group = read(RANDOM_KEY)
+  if (!group) {
+    group = randomGroup()
+    write(RANDOM_KEY, group)
+  }
+  return { group, source: 'random', participant: null }
+}
+
+function initialState() {
+  const override = read(OVERRIDE_KEY)
+  const auto = automaticAssignment()
+  return override ? { ...auto, group: override, source: 'override' } : auto
+}
+
 export function useGroupAssignment() {
-  const [group, setGroup] = useState(() => {
-    const stored = readStoredGroup()
-    if (stored) return stored
-    const assigned = randomGroup()
-    writeStoredGroup(assigned)
-    return assigned
-  })
+  const [state, setState] = useState(initialState)
 
   const overrideGroup = useCallback((next) => {
     if (!ALL_GROUPS.includes(next)) return
-    writeStoredGroup(next)
-    setGroup(next)
+    write(OVERRIDE_KEY, next)
+    setState((s) => ({ ...s, group: next, source: 'override' }))
   }, [])
 
-  const resetToRandom = useCallback(() => {
-    const assigned = randomGroup()
-    writeStoredGroup(assigned)
-    setGroup(assigned)
+  // Drops the override and goes back to the automatic assignment (the
+  // participant number if the link has one, otherwise the session's random
+  // draw).
+  const resetToAutomatic = useCallback(() => {
+    write(OVERRIDE_KEY, null)
+    setState(automaticAssignment())
   }, [])
 
-  return { group, overrideGroup, resetToRandom }
+  return { ...state, overrideGroup, resetToAutomatic }
 }
