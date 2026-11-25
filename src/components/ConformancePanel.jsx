@@ -4,9 +4,9 @@ import { useHoverTooltip } from '../hooks/useHoverTooltip.js'
 const DEVIATION_TIP = 'Click for this deviation’s frequency, history, and throughput impact'
 
 // Matches the alignment table + legend as shown in guide_event_level.pdf /
-// the Qualtrics export: a plain black-and-white grid, no colour-coding by
+// the Qualtrics export: a plain black-and-white grid, no color-coding by
 // move type (the legend explains the move type via the A / >> notation
-// itself, not via colour). Non-sync cells belonging to a deviation are
+// itself, not via color). Non-sync cells belonging to a deviation are
 // clickable — "details on demand" entered via this group's own
 // representation (see CLAUDE.md).
 function EventLevelView({ variant, onOpenDeviation }) {

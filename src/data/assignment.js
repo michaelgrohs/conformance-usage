@@ -5,7 +5,7 @@ import { ASSIGNMENT_SEED } from '../config.js'
 //
 // Participants get a personal link with their participant number, e.g.
 // .../conformance-usage/?p=7. Numbers are mapped to groups by block
-// randomisation: consecutive numbers form blocks of three (1–3, 4–6, ...),
+// randomization: consecutive numbers form blocks of three (1–3, 4–6, ...),
 // and each block contains every group exactly once, in a seeded random
 // order. So for any participants 1..N, group sizes differ by at most 1 —
 // as long as numbers are handed out in order without gaps. The mapping is

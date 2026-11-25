@@ -3,7 +3,7 @@ import { ALL_GROUPS, groupForParticipant, parseParticipantNumber, randomGroup } 
 
 // Which group this browser tab shows, in order of precedence:
 // 1. an admin override (set in the password-protected settings panel),
-// 2. the participant number in the link (?p=N) → block randomisation,
+// 2. the participant number in the link (?p=N) → block randomization,
 // 3. otherwise a random group, drawn once and kept for the browser session.
 // See assignment.js and CLAUDE.md "Group assignment".
 

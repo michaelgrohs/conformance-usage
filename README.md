@@ -29,7 +29,7 @@ Each participant gets a personal link with their participant number:
 
     https://michaelgrohs.github.io/conformance-usage/?p=7
 
-The group follows automatically from the number (block randomisation in
+The group follows automatically from the number (block randomization in
 blocks of three, so group sizes never differ by more than 1 as long as
 numbers are handed out in order without gaps). A link without `?p=` falls
 back to a random group for that browser session.

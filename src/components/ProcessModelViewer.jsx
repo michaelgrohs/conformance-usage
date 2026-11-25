@@ -25,7 +25,7 @@ function applyReadableDefaultView(canvas) {
 }
 
 // Global activity filter, applied as bpmn-js marker classes rather than
-// colour (consistent with the rest of the tool): this is a supplementary
+// color (consistent with the rest of the tool): this is a supplementary
 // highlight on top of the real filtering that happens elsewhere (the trace
 // selector and Overview dashboard are actually narrowed down — see
 // filtering.js), not a substitute for it. Must-include activities get a
@@ -80,14 +80,14 @@ export default function ProcessModelViewer({ onOpenActivity, activityFilter = []
     // Guards against React StrictMode's dev-mode double-invoke of effects:
     // without this, the first (soon-to-be-cleaned-up) viewer's async
     // importXML can resolve after it was already destroyed and throw.
-    let cancelled = false
+    let canceled = false
     const viewer = new BpmnJS({ container: containerRef.current })
     viewerRef.current = viewer
 
     viewer
       .importXML(orderToCashBpmnXml)
       .then(() => {
-        if (cancelled) return
+        if (canceled) return
         applyReadableDefaultView(viewer.get('canvas'))
         viewer.get('eventBus').on('element.click', (e) => {
           const el = e.element
@@ -99,13 +99,13 @@ export default function ProcessModelViewer({ onOpenActivity, activityFilter = []
         applyActivityFilter(viewer, activityFilterRef.current)
       })
       .catch((err) => {
-        if (cancelled) return
+        if (canceled) return
         // eslint-disable-next-line no-console
         console.error('Failed to render process model', err)
       })
 
     return () => {
-      cancelled = true
+      canceled = true
       readyRef.current = false
       viewerRef.current = null
       try {
